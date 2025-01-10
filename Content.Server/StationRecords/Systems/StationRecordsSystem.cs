@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Content.Server.Access.Systems;
 using Content.Server.Forensics;
+using Content.Shared._DV.NanoChat;
 using Content.Shared.Access.Components;
 using Content.Shared.GameTicking;
 using Content.Shared.Inventory;
@@ -8,6 +9,7 @@ using Content.Shared.PDA;
 using Content.Shared.Preferences;
 using Content.Shared.Roles;
 using Content.Shared.StationRecords;
+using Robust.Server.Player;
 using Robust.Shared.Enums;
 using Robust.Shared.Prototypes;
 
@@ -92,8 +94,17 @@ public sealed class StationRecordsSystem : SharedStationRecordsSystem
 
         TryComp<FingerprintComponent>(player, out var fingerprintComponent);
         TryComp<DnaComponent>(player, out var dnaComponent);
+        // NanoChat Begin (the _nanoChat.GetNumber method is scuffed so ill do this instead)
+        // this is still scuffed btw
+        TryComp<PdaComponent>(idUid, out var pdaComponent);
+        uint? ncId = null;
+        if (pdaComponent != null && pdaComponent.ContainedId != null && TryComp<NanoChatCardComponent>(pdaComponent.ContainedId, out var card))
+        {
+            ncId = card.Number;
+        }
+        //NanoChat End
 
-        CreateGeneralRecord(station, idUid.Value, profile.Name, profile.Age, profile.Species, profile.Gender, jobId, fingerprintComponent?.Fingerprint, dnaComponent?.DNA, profile, records);
+        CreateGeneralRecord(station, idUid.Value, profile.Name, profile.Age, profile.Species, profile.Gender, jobId, fingerprintComponent?.Fingerprint, dnaComponent?.DNA, ncId, profile, records);
     }
 
 
@@ -134,6 +145,7 @@ public sealed class StationRecordsSystem : SharedStationRecordsSystem
         string jobId,
         string? mobFingerprint,
         string? dna,
+        uint? nanoChatId,
         HumanoidCharacterProfile profile,
         StationRecordsComponent records)
     {
@@ -159,7 +171,8 @@ public sealed class StationRecordsSystem : SharedStationRecordsSystem
             Gender = gender,
             DisplayPriority = jobPrototype.RealDisplayWeight,
             Fingerprint = mobFingerprint,
-            DNA = dna
+            DNA = dna,
+            NanoChatId = nanoChatId.GetValueOrDefault(),
         };
 
         var key = AddRecordEntry(station, record);

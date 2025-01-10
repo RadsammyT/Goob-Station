@@ -35,11 +35,26 @@ public sealed class CrewManifestSection : BoxContainer
 
         foreach (var entry in entries)
         {
+
+            var nameBox = new BoxContainer()
+            {
+                Orientation = LayoutOrientation.Horizontal,
+                HorizontalExpand = true
+            };
             var name = new RichTextLabel()
             {
                 HorizontalExpand = true,
             };
             name.SetMessage(entry.Name);
+
+            var nanoChatId = new RichTextLabel()
+            {
+                HorizontalExpand = true,
+            };
+            nanoChatId.SetMessage("NC#" + entry.NanoChatNumber);
+
+            nameBox.AddChild(name);
+            nameBox.AddChild(nanoChatId);
 
             var titleContainer = new BoxContainer()
             {
@@ -69,7 +84,7 @@ public sealed class CrewManifestSection : BoxContainer
                 titleContainer.AddChild(title);
             }
 
-            gridContainer.AddChild(name);
+            gridContainer.AddChild(nameBox);
             gridContainer.AddChild(titleContainer);
         }
     }

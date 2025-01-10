@@ -37,6 +37,12 @@ public sealed record GeneralStationRecord
     public string JobPrototype = string.Empty;
 
     /// <summary>
+    ///     NanoChat ID tied to this station record.
+    /// </summary>
+    [DataField]
+    public uint NanoChatId = uint.MinValue;
+
+    /// <summary>
     ///     Species tied to this station record.
     /// </summary>
     [DataField]
