@@ -11,6 +11,7 @@ using Content.Shared._EstacaoPirata.Cards.Deck;
 using Content.Shared._EstacaoPirata.Cards.Stack;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
+using Content.Shared.Interaction.Events;
 using Content.Shared.Popups;
 using Content.Shared.Storage.EntitySystems;
 using Content.Shared.Verbs;
@@ -48,6 +49,7 @@ public sealed class CardHandSystem : EntitySystem
         SubscribeLocalEvent<CardHandComponent, CardHandDrawMessage>(OnCardDraw);
         SubscribeLocalEvent<CardHandComponent, CardStackQuantityChangeEvent>(OnStackQuantityChange);
         SubscribeLocalEvent<CardHandComponent, GetVerbsEvent<AlternativeVerb>>(OnAlternativeVerb);
+        SubscribeLocalEvent<CardHandComponent, UseInHandEvent>(OnUseInHand);
     }
 
     private void OnStackQuantityChange(EntityUid uid, CardHandComponent comp, CardStackQuantityChangeEvent args)
@@ -145,6 +147,15 @@ public sealed class CardHandSystem : EntitySystem
             Icon = new SpriteSpecifier.Texture(new("/Textures/Interface/VerbIcons/rotate_cw.svg.192dpi.png")),
             Priority = 1
         });
+    }
+
+    private void OnUseInHand(EntityUid entity, CardHandComponent comp, ref UseInHandEvent args)
+    {
+        if (args.Handled)
+            return;
+        FlipCards(entity, comp);
+        args.Handled = true;
+        return;
     }
 
     private void OnInteractUsing(EntityUid uid, CardComponent comp, InteractUsingEvent args)
